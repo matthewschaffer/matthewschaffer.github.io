@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Books I've Read</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .search-box {
+            width: 300px;
+            padding: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+        
+        .genre-filter {
+            margin-bottom: 20px;
+        }
+        
+        .filter-link {
+            margin-right: 15px;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        
+        .filter-link.active {
+            font-weight: bold;
+            text-decoration: none;
+        }
+        
+        .bookshelf {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .book {
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .book:hover {
+            opacity: 0.8;
+        }
+        
+        .book-cover {
+            width: 100%;
+            height: 256px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .book-cover.no-image {
+            background: #e9e9e9;
+            color: #666;
+            font-size: 12px;
+            padding: 0px;
+            text-align: center;
+            line-height: 1.2;
+        }
+        
+        .book-title {
+            font-weight: bold;
+            font-size: 13px;
+            margin-bottom: 5px;
+            line-height: 1.2;
+        }
+        
+        .book-author {
+            color: #666;
+            font-size: 12px;
+            line-height: 1.2;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .bookshelf {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 15px;
+            }
+            
+            .book-cover {
+                height: 160px;
+            }
+            
+            .search-box {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html"><img class="big_logo" src="images/Matthew_Schaffer_logo.png" alt="Matthew Schaffer logo" /></a>
+    <nav>
+        <ul id="menu">
+            <li><a href="about.html">About</a></li>
+            <li><a href="writing.html">Writing</a></li>
+            <li><a href="repository.html">Repository of Stuff I've Made</a></li>
+            <li><a href="quotes.html">Favorite Quotes</a></li>
+            <li><a href="recommendations.html">Recommendations</a></li>
+            <li><a href="books.html">Bookshelf</a></li>
+        </ul>
+    </nav>
+
+    <h2>Books I've Read</h2>
+    
+    <input type="text" class="search-box" id="search" placeholder="Search books or authors...">
+    
+    <div class="genre-filter">
+        <span class="filter-link active" data-genre="all">All</span>
+        <span class="filter-link" data-genre="favorite">Favorites</span>
+        <span class="filter-link" data-genre="psychology">Psychology</span>
+        <span class="filter-link" data-genre="technology">Technology</span>
+        <span class="filter-link" data-genre="comedy">Comedy</span>
+        <span class="filter-link" data-genre="business">Business</span>
+        <span class="filter-link" data-genre="philosophy">Philosophy</span>
+        <span class="filter-link" data-genre="memoir">Memoir</span>
+        <span class="filter-link" data-genre="science">Science</span>
+        <span class="filter-link" data-genre="creativity">Creativity</span>
+        <span class="filter-link" data-genre="self-help">Self Help</span>
+        <span class="filter-link" data-genre="fiction">Fiction</span>
+    </div>
+
+    <div class="bookshelf" id="bookshelf">
+        <!-- Books will be inserted here -->
+    </div>
+
+    <script>
+        // Your Bookshop affiliate ID - CHANGE THIS
+        const AFFILIATE_ID = "your-affiliate-id-here";
+
+        // Your books with multiple genres and cover support
+        // To add a cover: add cover: "images/covers/book-title.jpg" to any book entry
+        const books = [
+            { title: "The Making of a Therapist", author: "Louis Cozolino", genres: ["psychology", "memoir", "favorite"], cover: "https://m.media-amazon.com/images/I/41HJtYnsmSL._SY445_SX342_ControlCacheEqualizer_.jpg" },
+            { title: "Building a Bridge to the 18th Century", author: "Neil Postman", genres: ["technology", "philosophy"], cover: "https://m.media-amazon.com/images/I/51leseWwRZL._SY445_SX342_ControlCacheEqualizer_.jpg" },
+            { title: "Four Thousand Weeks", author: "Oliver Burkeman", genres: ["philosophy", "self-help"], cover: "https://m.media-amazon.com/images/I/412kxZO5s7L._SY445_SX342_ControlCacheEqualizer_.jpg" },
+            { title: "Range", author: "David Epstein", genres: ["psychology", "business"], cover: "https://m.media-amazon.com/images/I/41SQv-reWGL._SY445_SX342_ControlCacheEqualizer_.jpg"},
+            { title: "The Glass Cage", author: "Nicholas Carr", genres: ["technology", "psychology"], cover: "https://m.media-amazon.com/images/I/413dC5F8ckL._SY445_SX342_ControlCacheEqualizer_.jpg" },
+            { title: "Everything I Know About Love", author: "Dolly Alderton", genres: ["memoir"], cover: "https://m.media-amazon.com/images/I/415S0ADKs7L._SY445_SX342_ControlCacheEqualizer_.jpg" },
+            { title: "Amusing Ourselves to Death", author: "Neil Postman", genres: ["technology", "philosophy"], cover: "https://m.media-amazon.com/images/I/41h4ARjD2mL._SY445_SX342_ControlCacheEqualizer_.jpg" },
+            { title: "Authentic Happiness", author: "Martin Seligman", genres: ["psychology", "self-help"], cover: "" },
+            { title: "The Happiness Hypothesis", author: "Jonathan Haidt", genres: ["psychology", "philosophy"], cover: "" },
+            { title: "Born Standing Up", author: "Steve Martin", genres: ["comedy", "memoir", "favorite"], cover: "" },
+            { title: "Attention", author: "Casey Schwartz", genres: ["psychology", "technology"], cover: "" },
+            { title: "Technopoly", author: "Neil Postman", genres: ["technology", "philosophy"], cover: "" },
+            { title: "How Proust Can Change Your Life", author: "Alain de Botton", genres: ["philosophy", "self-help"], cover: "" },
+            { title: "Profiles in Ignorance", author: "Andy Borowitz", genres: ["comedy"], cover: "" },
+            { title: "Someone Who Will Love You in All Your Damaged Glory", author: "Raphael Bob-Waksberg", genres: ["comedy", "fiction", "favorite"], cover: "" },
+            { title: "Sick in the Head", author: "Judd Apatow", genres: ["comedy", "memoir", "favorite"], cover: "" },
+            { title: "Sicker in the Head", author: "Judd Apatow", genres: ["comedy", "memoir"], cover: "" },
+            { title: "Thinking, Fast and Slow", author: "Daniel Kahneman", genres: ["psychology", "science", "favorite"], cover: "" },
+            { title: "I Found This Funny", author: "Judd Apatow", genres: ["comedy", "favorite"], cover: "" },
+            { title: "The Victorian Internet", author: "Tom Standage", genres: ["technology"], cover: "" },
+            { title: "Wherever You Go There You Are", author: "Jon Kabat-Zinn", genres: ["psychology", "philosophy"], cover: "" },
+            { title: "When Breath Becomes Air", author: "Paul Kalanithi", genres: ["memoir", "philosophy", "favorite"], cover: "" },
+            { title: "Comedy Bang! Bang! The Podcast: The Book", author: "Scott Aukerman", genres: ["comedy"], cover: "" },
+            { title: "The Person and the Situation", author: "Lee Ross", genres: ["psychology", "science"], cover: "" },
+            { title: "Mindfulness", author: "Mark Williams", genres: ["psychology", "self-help"], cover: "" },
+            { title: "Sick Souls, Healthy Minds", author: "John Kaag", genres: ["philosophy", "psychology"], cover: "" },
+            { title: "Hiking with Nietzsche", author: "John Kaag", genres: ["philosophy", "memoir", "favorite"], cover: "" },
+            { title: "Born A Crime", author: "Trevor Noah", genres: ["comedy", "memoir"], cover: "" },
+            { title: "Early Bird", author: "Rodney Rothman", genres: ["comedy", "memoir"], cover: "" },
+            { title: "Egghead", author: "Bo Burnham", genres: ["comedy", "favorite"], cover: "" },
+            { title: "Ant Farm", author: "Simon Rich", genres: ["comedy", "fiction"], cover: "" },
+            { title: "Spoiled Brats", author: "Simon Rich", genres: ["comedy", "fiction"], cover: "" },
+            { title: "Hits & Misses", author: "Simon Rich", genres: ["comedy", "fiction"], cover: "" },
+            { title: "Man Seeking Woman", author: "Simon Rich", genres: ["comedy", "fiction", "favorite"], cover: "" },
+            { title: "Humblebrag", author: "Harris Wittels", genres: ["comedy"], cover: "" },
+            { title: "The Dude and the Zen Master", author: "Jeff Bridges", genres: ["philosophy", "memoir", "favorite"], cover: "" },
+            { title: "The Upright Citizens Brigade Comedy Improvisation Manual", author: "Upright Citizens Brigade", genres: ["comedy", "creativity"], cover: "" },
+            { title: "Creative Confidence", author: "Tom Kelley", genres: ["creativity", "business"], cover: "" },
+            { title: "Change By Design", author: "Tim Brown", genres: ["creativity", "business"], cover: "" },
+            { title: "Loonshots", author: "Safi Bahcall", genres: ["business", "science"], cover: "" },
+            { title: "The Design of Everyday Things", author: "Don Norman", genres: ["technology", "psychology", "favorite"], cover: "" },
+            { title: "Digital Minimalism", author: "Cal Newport", genres: ["technology", "self-help"], cover: "" },
+            { title: "Deep Work", author: "Cal Newport", genres: ["psychology", "business", "self-help"], cover: "" },
+            { title: "Switch", author: "Chip Heath", genres: ["psychology", "business"], cover: "" },
+            { title: "In Praise of Idleness", author: "Bertrand Russell", genres: ["philosophy"], cover: "" },
+            { title: "New Hopes for a Changing World", author: "Bertrand Russell", genres: ["philosophy"], cover: "" },
+            { title: "Still the Mind", author: "Alan Watts", genres: ["philosophy", "psychology"], cover: "" },
+            { title: "Wabi Sabi", author: "Unknown", genres: ["philosophy"], cover: "" },
+            { title: "Predictably Irrational", author: "Dan Ariely", genres: ["psychology", "business"], cover: "" },
+            { title: "Abolish Silicon Valley", author: "Wendy Liu", genres: ["technology"], cover: "" },
+            { title: "Letters from a Stoic", author: "Seneca", genres: ["philosophy"], cover: "" },
+            { title: "The Alchemist", author: "Paulo Coelho", genres: ["fiction", "philosophy"], cover: "" },
+            { title: "The War of Art", author: "Steven Pressfield", genres: ["creativity", "self-help"], cover: "" },
+            { title: "Meditations", author: "Marcus Aurelius", genres: ["philosophy", "favorite"], cover: "" },
+            { title: "Collected Short Stories of Roald Dahl", author: "Roald Dahl", genres: ["fiction"], cover: "" },
+            { title: "Zen and the Art of Motorcycle Maintenance", author: "Robert Pirsig", genres: ["philosophy", "memoir"], cover: "" },
+            { title: "Autocracy Inc.", author: "Anne Applebaum", genres: ["politics"], cover: "" },
+            { title: "Superbloom", author: "Nicholas Carr", genres: ["technology", "psychology"], cover: "" },
+            { title: "The Shallows", author: "Nicholas Carr", genres: ["technology", "psychology", "favorite"], cover: "" },
+            { title: "Man's Search for Meaning", author: "Viktor Frankl", genres: ["philosophy", "psychology", "memoir"], cover: "" },
+            { title: "The Conquest of Happiness", author: "Bertrand Russell", genres: ["philosophy", "self-help"], cover: "" },
+            { title: "Emotional Intelligence", author: "Daniel Goleman", genres: ["psychology", "self-help"], cover: "" },
+            { title: "The Varieties of Scientific Experience", author: "Carl Sagan", genres: ["science", "philosophy"], cover: "" },
+            { title: "Creativity", author: "Mihaly Csikszentmihalyi", genres: ["psychology", "creativity"], cover: "" },
+            { title: "Flow", author: "Mihaly Csikszentmihalyi", genres: ["psychology", "self-help"], cover: "" },
+            { title: "Fires in the Dark", author: "Kay Redfield Jamison", genres: ["psychology", "memoir", "favorite"], cover: "" },
+            { title: "The Mindful Way Through Depression", author: "Mark Williams", genres: ["psychology", "self-help"], cover: "" },
+            { title: "The Love Prescription", author: "John Gottman", genres: ["psychology", "self-help"], cover: "" },
+            { title: "The Development of a Therapist", author: "Louis Cozolino", genres: ["psychology"], cover: "" },
+            { title: "More Than Words", author: "John Warner", genres: ["creativity"], cover: "" },
+            { title: "Cognitive Behavioral Therapy", author: "Judith Beck", genres: ["psychology"], cover: "" },
+            { title: "Shift", author: "Ethan Kross", genres: ["psychology", "self-help"], cover: "" },
+            { title: "Stumbling on Happiness", author: "Daniel Gilbert", genres: ["psychology", "science"], cover: "" },
+            { title: "The Stranger", author: "Albert Camus", genres: ["fiction", "philosophy"], cover: "" },
+            { title: "The Experience Machine", author: "Andy Clark", genres: ["philosophy", "science"], cover: "" },
+            { title: "Utopia is Creepy", author: "Nicholas Carr", genres: ["technology"], cover: "" },
+            { title: "Hackers and Painters", author: "Paul Graham", genres: ["technology", "business"], cover: "" },
+            { title: "Mindset", author: "Carol Dweck", genres: ["psychology", "self-help"], cover: "" },
+            { title: "The Zen of Climbing", author: "Francis Sanzaro", genres: ["philosophy", "memoir"], cover: "" },
+            { title: "How To Tell a Story", author: "The Moth", genres: ["creativity"], cover: "" },
+            { title: "Bowling Alone", author: "Robert Putnam", genres: ["psychology", "politics"], cover: "" },
+            { title: "How to Know a Person", author: "David Brooks", genres: ["psychology", "self-help"], cover: "" },
+            { title: "Story", author: "Robert McKee", genres: ["creativity"], cover: "" },
+            { title: "Save the Cat!", author: "Blake Snyder", genres: ["creativity"], cover: "" },
+            { title: "Motivational Interviewing", author: "William R. Miller", genres: ["psychology"], cover: "" },
+            { title: "The Myth of Sisyphus", author: "Albert Camus", genres: ["philosophy"], cover: "" },
+            { title: "Positive Psychotherapy", author: "Tayyab Rashid", genres: ["psychology"], cover: "" },
+            { title: "The Varieties of Religious Experience", author: "William James", genres: ["psychology", "philosophy", "favorite"], cover: "" },
+            { title: "I Love You More than You Know", author: "Jonathan Ames", genres: ["memoir", "comedy"], cover: "" },
+            { title: "The Undoing Project", author: "Michael Lewis", genres: ["psychology", "science", "business", "favorite"], cover: "" },
+            { title: "Glory Days", author: "Simon Rich", genres: ["comedy", "fiction", "favorite"], cover: "" },
+            { title: "Steve Jobs", author: "Walter Isaacson", genres: ["memoir", "business", "technology", "favorite"], cover: "" },
+            { title: "The Best Minds", author: "Jonathan Rosen", genres: ["memoir"], cover: "" },
+            { title: "Quiet", author: "Susan Cain", genres: ["psychology", "self-help"], cover: "" },
+            { title: "The Empathy Diaries", author: "Sherry Turkle", genres: ["technology", "psychology", "memoir", "favorite"], cover: "" },
+            { title: "Maybe You Should Talk to Someone", author: "Lori Gottlieb", genres: ["psychology", "memoir"], cover: "" },
+            { title: "The Good Life", author: "Robert Waldinger", genres: ["psychology", "self-help"], cover: "" },
+            { title: "The Hidden Tools of Comedy", author: "Steve Kaplan", genres: ["comedy", "creativity"], cover: "" },
+            { title: "Tomorrow, and Tomorrow, and Tomorrow", author: "Gabrielle Zevin", genres: ["fiction"], cover: "" },
+            { title: "Dopamine Nation", author: "Anna Lembke", genres: ["psychology", "science"], cover: "" },
+            { title: "The Disordered Mind", author: "Eric Kandel", genres: ["psychology", "science"], cover: "" },
+            { title: "The Discovery of the Unconscious", author: "Henri Ellenberger", genres: ["psychology"], cover: "" },
+            { title: "The Antidote", author: "Oliver Burkeman", genres: ["philosophy", "self-help"], cover: "" },
+            { title: "Chatter", author: "Ethan Kross", genres: ["psychology", "self-help"], cover: "" },
+            { title: "No Filter", author: "Sarah Frier", genres: ["technology", "business"], cover: "" },
+            { title: "Naked Economics", author: "Charles Wheelan", genres: ["business"], cover: "" },
+            { title: "Not By Chance Alone", author: "Elliot Aronson", genres: ["psychology", "memoir", "favorite"], cover: "" },
+            { title: "Zucked", author: "Roger McNamee", genres: ["technology", "memoir"], cover: "" },
+            { title: "The Ride of a Lifetime", author: "Robert Iger", genres: ["business", "memoir"], cover: "" },
+            { title: "Learned Optimism", author: "Martin Seligman", genres: ["psychology", "self-help"], cover: "" },
+            { title: "Epidemics and Society", author: "Frank M. Snowden III", genres: ["science"], cover: "" },
+            { title: "The Pursuit of Perfect", author: "Tal Ben-Shahar", genres: ["psychology", "self-help"], cover: "" },
+            { title: "Between the World and Me", author: "Ta-Nehisi Coates", genres: ["memoir", "politics"], cover: "" },
+            { title: "The New New Thing", author: "Michael Lewis", genres: ["business", "technology", "favorite"], cover: "" },
+            { title: "The Painted Word", author: "Tom Wolfe", genres: ["memoir"], cover: "" },
+            { title: "Better", author: "Atul Gawande", genres: ["science", "memoir"], cover: "" },
+            { title: "The Fifth Risk", author: "Michael Lewis", genres: ["business", "politics", "favorite"], cover: "" },
+            { title: "Poking a Dead Frog", author: "Mike Sacks", genres: ["comedy", "creativity"], cover: "" },
+            { title: "Ghost World", author: "Daniel Clowes", genres: ["fiction"], cover: "" },
+            { title: "The Zoo Story", author: "Edward Albee", genres: ["fiction", "favorite"], cover: "" },
+            { title: "Misbehaving", author: "Richard Thaler", genres: ["psychology", "business"], cover: "" },
+            { title: "The Social Animal", author: "Elliot Aronson", genres: ["psychology"], cover: "" },
+            { title: "The Power of Meaning", author: "Emily Esfahani", genres: ["philosophy", "self-help"], cover: "" },
+            { title: "Grit", author: "Angela Duckworth", genres: ["psychology", "self-help"], cover: "" },
+            { title: "Stories and Scripts", author: "Zack Love", genres: ["creativity"], cover: "" },
+            { title: "Switch Bitch", author: "Roald Dahl", genres: ["fiction"], cover: "" },
+            { title: "The Death-Ray", author: "Daniel Clowes", genres: ["fiction", "favorite"], cover: "" },
+            { title: "Siddhartha", author: "Hermann Hesse", genres: ["fiction", "philosophy"], cover: "" },
+            { title: "My Uncle Oswald", author: "Roald Dahl", genres: ["fiction", "favorite"], cover: "" },
+            { title: "Me Talk Pretty One Day", author: "David Sedaris", genres: ["comedy", "memoir"], cover: "" },
+            { title: "The Social Animal", author: "David Brooks", genres: ["psychology"], cover: "" },
+            { title: "The Innovators", author: "Walter Isaacson", genres: ["technology", "business"], cover: "" },
+            { title: "Think Like a Freak", author: "Steven Levitt", genres: ["psychology", "business"], cover: "" },
+            { title: "Decisive", author: "Chip Heath", genres: ["psychology", "business"], cover: "" },
+            { title: "Finding Flow", author: "Mihaly Csikszentmihalyi", genres: ["psychology", "self-help"], cover: "" },
+            { title: "The Happiness Advantage", author: "Shawn Achor", genres: ["psychology", "self-help", "favorite"], cover: "" },
+            { title: "An Unquiet Mind", author: "Kay Redfield Jamison", genres: ["psychology", "memoir"], cover: "" },
+            { title: "Scar Tissue", author: "Anthony Kiedis", genres: ["memoir"], cover: "" },
+            { title: "Made to Stick", author: "Chip Heath", genres: ["psychology", "business"], cover: "" },
+            { title: "Freakonomics", author: "Steven Levitt", genres: ["psychology", "business"], cover: "" },
+            { title: "Creativity Inc.", author: "Ed Catmull", genres: ["business", "creativity"], cover: "" },
+            { title: "Is Sex Necessary?", author: "James Thurber", genres: ["comedy", "favorite"], cover: "" },
+            { title: "Addiction by Design", author: "Natasha Schull", genres: ["psychology", "technology"], cover: "" },
+            { title: "30 Lessons for Living", author: "Karl Pillemer", genres: ["self-help", "favorite"], cover: "" },
+            { title: "The Molecule of More", author: "Daniel Z. Lieberman", genres: ["psychology", "science", "favorite"], cover: "" },
+            { title: "10% Happier", author: "Dan Harris", genres: ["psychology", "self-help", "memoir"], cover: "" },
+            { title: "This Is Water", author: "David Foster Wallace", genres: ["philosophy", "favorite"], cover: "" },
+            { title: "Tiny Beautiful Things", author: "Cheryl Strayed", genres: ["memoir", "self-help"], cover: "" },
+            { title: "How to Change Your Mind", author: "Michael Pollan", genres: ["psychology", "science"], cover: "" },
+            { title: "Drive", author: "Daniel Pink", genres: ["psychology", "business"], cover: "" },
+            { title: "The Paradox of Choice", author: "Barry Schwartz", genres: ["psychology", "self-help", "favorite"], cover: "" },
+            { title: "Letterman", author: "Jason Zinoman", genres: ["comedy", "memoir"], cover: "" },
+            { title: "The End of Education", author: "Neil Postman", genres: ["philosophy"], cover: "" }
+        ];
+
+        function createBookLink(book) {
+            const searchQuery = encodeURIComponent(`${book.title} ${book.author}`);
+            return `https://bookshop.org/books?keywords=${searchQuery}&aid=${AFFILIATE_ID}`;
+        }
+
+        function renderBooks(booksToShow = books) {
+            const bookshelf = document.getElementById('bookshelf');
+            bookshelf.innerHTML = '';
+
+            booksToShow.forEach((book) => {
+                const bookElement = document.createElement('a');
+                bookElement.className = 'book';
+                bookElement.href = createBookLink(book);
+                bookElement.target = '_blank';
+                bookElement.rel = 'noopener noreferrer';
+
+                let coverDiv;
+                if (book.cover) {
+                    // Use manual cover
+                    coverDiv = document.createElement('div');
+                    coverDiv.className = 'book-cover';
+                    coverDiv.style.backgroundImage = `url(${book.cover})`;
+                } else {
+                    // Show placeholder with book title
+                    coverDiv = document.createElement('div');
+                    coverDiv.className = 'book-cover no-image';
+                    coverDiv.textContent = book.title;
+                }
+
+                bookElement.innerHTML = `
+                    ${coverDiv.outerHTML}
+                    <div class="book-title">${book.title}</div>
+                    <div class="book-author">${book.author}</div>
+                `;
+
+                bookshelf.appendChild(bookElement);
+            });
+        }
+
+        // Search functionality
+        document.getElementById('search').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const activeGenre = document.querySelector('.filter-link.active').dataset.genre;
+            
+            let filteredBooks = books;
+            
+            if (activeGenre !== 'all') {
+                filteredBooks = books.filter(book => book.genres.includes(activeGenre));
+            }
+            
+            if (searchTerm) {
+                filteredBooks = filteredBooks.filter(book => 
+                    book.title.toLowerCase().includes(searchTerm) || 
+                    book.author.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            renderBooks(filteredBooks);
+        });
+
+        // Filter functionality
+        document.querySelectorAll('.filter-link').forEach(link => {
+            link.addEventListener('click', function() {
+                document.querySelectorAll('.filter-link').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+                
+                const genre = this.dataset.genre;
+                const searchTerm = document.getElementById('search').value.toLowerCase();
+                
+                let filteredBooks = genre === 'all' ? books : books.filter(book => book.genres.includes(genre));
+                
+                if (searchTerm) {
+                    filteredBooks = filteredBooks.filter(book => 
+                        book.title.toLowerCase().includes(searchTerm) || 
+                        book.author.toLowerCase().includes(searchTerm)
+                    );
+                }
+                
+                renderBooks(filteredBooks);
+            });
+        });
+
+        // Initialize
+        renderBooks();
+    </script>
+</body>
+</html>

@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>R.E.P. - Random Encounters with People</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
+    
+    <style>
+        /* Map container */
+        #map {
+            height: 70vh;
+            width: 100%;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Custom marker styles */
+        .custom-marker {
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }
+
+        .star-marker {
+            width: 20px !important;
+            height: 20px !important;
+            background: #ffd700;
+            border: 2px solid white;
+            position: relative;
+            transform: rotate(0deg);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }
+
+        .star-marker:before {
+            content: '★';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Popup styles */
+        .leaflet-popup-content-wrapper {
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .encounter-popup {
+            max-width: 280px;
+            font-family: Arial, sans-serif;
+            line-height: 1.4;
+        }
+
+        .encounter-photo {
+            width: 100%;
+            max-width: 280px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .encounter-title {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .encounter-date {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .encounter-story {
+            font-size: 13px;
+            line-height: 1.4;
+            color: #444;
+        }
+
+        .no-photo {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-style: italic;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        /* Loading and error states */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            color: #721c24;
+        }
+
+        /* Legend */
+        .legend {
+            background: white;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .legend h3 {
+            margin-top: 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+
+        .legend-pin {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-right: 12px;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .legend-pin.high-school { background: #007bff; }
+        .legend-pin.college { background: #00a651; }
+        .legend-pin.celebrity { 
+            background: #ffd700;
+            border-radius: 0;
+            position: relative;
+        }
+        .legend-pin.celebrity:before {
+            content: '★';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 10px;
+        }
+        .legend-pin.random { background: #dc3545; }
+
+        .instructions {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+
+        .instructions h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .instructions code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .instructions pre {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            color: #155724;
+        }
+
+        @media (max-width: 768px) {
+            #map {
+                height: 50vh;
+            }
+            
+            .encounter-popup {
+                max-width: 220px;
+            }
+            
+            .legend {
+                margin: 10px;
+                padding: 12px;
+            }
+            
+            .instructions {
+                margin: 10px;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html"><img class="big_logo" src="images/Matthew_Schaffer_logo.png" alt="Matthew Schaffer logo" /></a>
+    <nav>
+        <ul id="menu">
+            <li><a href="about.html">About</a></li>
+            <li><a href="writing.html">Writing</a></li>
+            <li><a href="repository.html">Repository of Stuff I've Made</a></li>
+            <li><a href="quotes.html">Favorite Quotes</a></li>
+            <li><a href="recommendations.html">Recommendations</a></li>
+            <li><a href="books.html">Bookshelf</a></li>
+            <li><a href="encounters.html">R.E.P.</a></li>
+        </ul>
+    </nav>
+
+    <h2>R.E.P. - Random Encounters with People</h2>
+    <p>A map of all the random times I've bumped into people around NYC - from high school friends to celebrities to complete strangers with interesting stories.</p>
+
+    <!-- Success Message -->
+    <div class="success">
+        <strong>✅ No API keys or credit cards needed!</strong> This map uses OpenStreetMap and works immediately.
+    </div>
+
+    <!-- Setup Instructions -->
+    <div class="instructions">
+        <h3>📝 How to Add Your Encounters</h3>
+        
+        <p><strong>Step 1: Get Coordinates</strong></p>
+        <ol>
+            <li>Go to <a href="https://maps.google.com" target="_blank" rel="noopener">Google Maps</a></li>
+            <li>Find your location and right-click on it</li>
+            <li>Click on the coordinates that appear (they look like: 40.7580, -73.9855)</li>
+            <li>The coordinates are now copied to your clipboard!</li>
+        </ol>
+
+        <p><strong>Step 2: Edit the Encounters Array</strong></p>
+        <p>Find the <code>encounters</code> array in the JavaScript section below and add your data like this:</p>
+        
+        <pre><code>{
+    lat: 40.7580,           // First number from coordinates
+    lng: -73.9855,          // Second number from coordinates  
+    person: "J.D.",         // Use initials for privacy
+    date: "2024-01-15",     // YYYY-MM-DD format
+    story: "Your story...", // What happened
+    photo_url: "",          // Optional photo URL or leave empty
+    category: "high-school" // high-school, college, celebrity, or random
+}</code></pre>
+
+        <p><strong>Step 3: Save and Refresh</strong></p>
+        <p>Save the file and refresh your browser to see your new encounters!</p>
+
+        <p><strong>Google Sheets Option (Advanced):</strong> Create a sheet with columns <code>Lat, Lng, Person, Date, Story, Photo_URL, Category</code>, publish as CSV, and update the configuration below.</p>
+    </div>
+
+    <div class="legend">
+        <h3>Encounter Types</h3>
+        <div class="legend-item">
+            <div class="legend-pin high-school"></div>
+            <span>High School Friends</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-pin college"></div>
+            <span>College Friends</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-pin celebrity"></div>
+            <span>Celebrities</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-pin random"></div>
+            <span>Random People</span>
+        </div>
+    </div>
+
+    <div id="loading" class="loading">Loading map...</div>
+    <div id="error" class="error" style="display: none;"></div>
+    <div id="map"></div>
+
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+
+    <script>
+        // Configuration - Update these if using Google Sheets
+        const CONFIG = {
+            googleSheetsUrl: 'YOUR_GOOGLE_SHEETS_CSV_URL',
+            useGoogleSheets: false,
+            centerLat: 40.7589,
+            centerLng: -73.9851,
+            defaultZoom: 12
+        };
+
+        // ADD YOUR ENCOUNTERS HERE - Replace this sample data with your real encounters
+        const encounters = [
+            {
+                lat: 40.7580,
+                lng: -73.9855,
+                person: "J.D.",
+                date: "2024-08-15",
+                story: "Randomly ran into my high school lab partner while walking through Times Square. He's now working at a tech startup in Brooklyn. We grabbed coffee and caught up for an hour!",
+                photo_url: "",
+                category: "high-school"
+            },
+            {
+                lat: 40.7794,
+                lng: -73.9632,
+                person: "Sarah Jessica Parker",
+                date: "2024-07-22",
+                story: "Spotted SJP walking her dog near Bethesda Fountain in Central Park. She was super friendly when I said hi and even took a quick selfie!",
+                photo_url: "",
+                category: "celebrity"
+            },
+            {
+                lat: 40.7061,
+                lng: -73.9969,
+                person: "M.S.",
+                date: "2024-06-10",
+                story: "College roommate was visiting from California. Completely random encounter while both of us were showing the Brooklyn Bridge to different groups of friends!",
+                photo_url: "",
+                category: "college"
+            },
+            {
+                lat: 40.7505,
+                lng: -74.0056,
+                person: "Coffee Shop Regular",
+                date: "2024-09-01",
+                story: "This guy I always see at my local coffee shop but never talked to. Turns out he lives in the same building! We had a great conversation about NYC neighborhood life.",
+                photo_url: "",
+                category: "random"
+            }
+        ];
+
+        let map;
+
+        function initMap() {
+            try {
+                // Create the map
+                map = L.map('map').setView([CONFIG.centerLat, CONFIG.centerLng], CONFIG.defaultZoom);
+
+                // Add the tile layer
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                    maxZoom: 19
+                }).addTo(map);
+
+                // Load encounters
+                if (CONFIG.useGoogleSheets && CONFIG.googleSheetsUrl !== 'YOUR_GOOGLE_SHEETS_CSV_URL') {
+                    loadFromGoogleSheets();
+                } else {
+                    createMarkers(encounters);
+                }
+
+                document.getElementById('loading').style.display = 'none';
+            } catch (error) {
+                console.error('Error initializing map:', error);
+                showError('Failed to initialize map. Please check the console for details.');
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        async function loadFromGoogleSheets() {
+            try {
+                const response = await fetch(CONFIG.googleSheetsUrl);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const csvText = await response.text();
+                const parsedEncounters = parseCSV(csvText);
+                createMarkers(parsedEncounters);
+            } catch (error) {
+                console.error('Error loading from Google Sheets:', error);
+                showError('Failed to load encounters from Google Sheets. Using sample data instead.');
+                createMarkers(encounters);
+            }
+        }
+
+        function parseCSV(csvText) {
+            const lines = csvText.trim().split('\n');
+            if (lines.length < 2) {
+                throw new Error('CSV file appears to be empty or invalid');
+            }
+
+            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+            
+            return lines.slice(1).map(line => {
+                const values = line.split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+                const encounter = {};
+                
+                headers.forEach((header, index) => {
+                    encounter[header] = values[index] || '';
+                });
+                
+                // Convert lat/lng to numbers
+                encounter.lat = parseFloat(encounter.lat);
+                encounter.lng = parseFloat(encounter.lng);
+                
+                if (isNaN(encounter.lat) || isNaN(encounter.lng)) {
+                    console.warn('Invalid coordinates for encounter:', encounter);
+                    return null;
+                }
+                
+                return encounter;
+            }).filter(encounter => encounter !== null);
+        }
+
+        function createMarkers(encounterData) {
+            if (!encounterData || encounterData.length === 0) {
+                showError('No valid encounter data found.');
+                return;
+            }
+
+            encounterData.forEach((encounter, index) => {
+                if (!encounter.lat || !encounter.lng) {
+                    console.warn(`Skipping encounter ${index}: invalid coordinates`, encounter);
+                    return;
+                }
+                createMarker(encounter);
+            });
+        }
+
+        function createMarker(encounter) {
+            let marker;
+
+            if (encounter.category === 'celebrity') {
+                // Create star icon for celebrities
+                const starIcon = L.divIcon({
+                    html: '<div class="star-marker"></div>',
+                    className: 'custom-marker',
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12],
+                    popupAnchor: [0, -12]
+                });
+                marker = L.marker([encounter.lat, encounter.lng], { icon: starIcon });
+            } else {
+                // Create colored circle markers for others
+                const colors = {
+                    'high-school': '#007bff',
+                    'college': '#00a651',
+                    'random': '#dc3545'
+                };
+                
+                const color = colors[encounter.category] || colors['random'];
+                
+                marker = L.circleMarker([encounter.lat, encounter.lng], {
+                    radius: 8,
+                    fillColor: color,
+                    color: 'white',
+                    weight: 3,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                });
+            }
+
+            // Create popup content
+            const popupContent = createPopupContent(encounter);
+            marker.bindPopup(popupContent, {
+                maxWidth: 300,
+                className: 'encounter-popup-wrapper'
+            });
+
+            marker.addTo(map);
+        }
+
+        function createPopupContent(encounter) {
+            let formattedDate = 'Date not available';
+            try {
+                if (encounter.date) {
+                    formattedDate = new Date(encounter.date).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                }
+            } catch (e) {
+                console.warn('Invalid date format:', encounter.date);
+            }
+
+            let photoHtml = '<div class="encounter-photo no-photo">No photo available</div>';
+            if (encounter.photo_url && encounter.photo_url.trim() !== '') {
+                photoHtml = `<img src="${encounter.photo_url}" alt="Encounter photo" class="encounter-photo" onerror="this.outerHTML='<div class=\\'encounter-photo no-photo\\'>Photo failed to load</div>'">`;
+            }
+
+            return `
+                <div class="encounter-popup">
+                    ${photoHtml}
+                    <div class="encounter-title">${encounter.person || 'Unknown Person'}</div>
+                    <div class="encounter-date">${formattedDate}</div>
+                    <div class="encounter-story">${encounter.story || 'No story available.'}</div>
+                </div>
+            `;
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            console.error(message);
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            initMap();
+        });
+    </script>
+
+</body>
+</html>

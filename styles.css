@@ -31,10 +31,12 @@ ul {
   list-style: none;
   margin: 0px auto auto auto;
   text-align: center;
+  padding: 0px;
  
 }
 li {
   margin: 15px;
+  margin-left: 0px;
 }
 .writing {
   width: 720px;
@@ -163,4 +165,7 @@ p {
 }
 ul.no-shadow {
   text-shadow: none;
+}
+figcaption {
+  text-align: center;
 }
