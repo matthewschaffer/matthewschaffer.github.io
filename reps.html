@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>R.E.P.S. - Random Encounters with People on the Street</title>
     <link rel="stylesheet" href="styles.css">
     
@@ -228,12 +229,22 @@
     <a href="index.html"><img class="big_logo" src="images/Matthew_Schaffer_logo.png" alt="Matthew Schaffer logo" /></a>
     <nav>
         <ul id="menu">
+            <li><a href="about.html">About</a></li>
+            <li><a href="writing.html">Writing</a></li>
+            <li><a href="repository.html">Repository of Stuff I've Made</a></li>
+            <li><a href="quotes.html">Favorite Quotes</a></li>
+            <li><a href="recommendations.html">Recommendations</a></li>
+            <li><a href="books.html">Bookshelf</a></li>
             <li><a href="reps.html">R.E.P.S.</a></li>
         </ul>
     </nav>
 
     <h2>R.E.P.S. - Random Encounters with People on the Street</h2>
     <p>A map of all the random times I've bumped into people around NYC - from high school friends to celebrities to complete strangers with interesting stories.</p>
+
+    <div class="success">
+        <strong>📍 Using Local Photos:</strong> Put your encounter photos in <code>images/encounters/</code> folder and reference them like: <code>"images/encounters/your-photo.jpg"</code>
+    </div>
 
     <div class="legend">
         <h3>Encounter Types</h3>
@@ -278,37 +289,64 @@
         const encounters = [
             {
                 lat: 40.74171124944387,
-                lng:  -73.98105737769384,
-                person: "G.A.B.E.S.",
-                date: "2025-08-11",
+                lng: -73.98105737769384,
+                person: "GABES",
+                date: "2025-09-11",
                 story: "Got hibachi with my friends from high school!",
-                photo_url: "",
+                photo_url: "images/encounters/gabes-hibachi.jpg",
                 category: "high-school"
             },
             {
-                lat: 40.7794,
-                lng: -73.9632,
-                person: "Sarah Jessica Parker",
-                date: "2024-07-22",
-                story: "Spotted SJP walking her dog near Bethesda Fountain in Central Park. She was super friendly when I said hi and even took a quick selfie!",
-                photo_url: "",
+                lat: 40.714235,
+                lng: -73.956049,
+                person: "GABES",
+                date: "2025-04-02",
+                story: "Got some good steaks with my homies!",
+                photo_url: "images/encounters/st_anselm.jpg",
+                category: "high-school"
+            },  
+            {
+                lat: 40.760994,
+                lng: -73.977857,
+                person: "GABES",
+                date: "2025-09-11",
+                story: "Got Fogo de Chão with da crew!",
+                photo_url: "images/encounters/fogo.jpg",
+                category: "high-school"
+            },                      
+            {
+                lat: 40.734452,
+                lng: -73.992236,
+                person: "Seth Meyers",
+                date: "2025-09-16",
+                story: "I woke up this morning and realized I had left my computer charger in the office. My first client had cancelled so I had time to hop on a subway and get my charger before my first client of the day. As I walked past P.F. Changs on 13th, there he was with his children and holding their bags!",
+                photo_url: "images/encounters/seth_meyers.jpg",
                 category: "celebrity"
             },
             {
                 lat: 40.7061,
                 lng: -73.9969,
-                person: "M.S.",
-                date: "2024-06-10",
-                story: "College roommate was visiting from California. Completely random encounter while both of us were showing the Brooklyn Bridge to different groups of friends!",
-                photo_url: "",
-                category: "college"
+                person: "C.B.",
+                date: "2025-09-16",
+                story: "I went to Chris Gethard's demonstration/talk about his non-profit Laughing Together at UCB around 5 PM. After the demonstration, I decided to walk to Bravo Pizza on Park Ave for a chicken roll. I'm walking past Whiskey Roxx, minding my business, and who do I see? C.B.! She walked right past me without noticing. I didn't say hi. (teen tour person)",
+                photo_url: "images/encounters/cb.jpg",
+                category: "random"
             },
             {
-                lat: 40.7505,
-                lng: -74.0056,
-                person: "Coffee Shop Regular",
-                date: "2024-09-01",
-                story: "This guy I always see at my local coffee shop but never talked to. Turns out he lives in the same building! We had a great conversation about NYC neighborhood life.",
+                lat: 40.764165,
+                lng: -73.970620,
+                person: "K.S.",
+                date: "2025-09-10",
+                story: "It was a rainy day, but I had an 8:55 AM iPhone battery replacement appointment to get to. So I braved the weather and walked the 15 minutes to the 5th Avenue Apple Store. Crazy store. But on my way there, I walked past K.S. K.S. and I went on a teen tour together many moons ago. She was rushing and didn't see me. I didn't try to say hi either.",
+                photo_url: "",
+                category: "random"
+            }
+            {
+                lat: 40.764165,
+                lng: -73.970620,
+                person: "Y.T.",
+                date: "2025-08-28",
+                story: "Sometimes when I recognize someone from my past my whole body reacts. That's what happened on August 28th, 2025. I saw Y.T. Y.T. was a girl I met in elementary or middle school. She had just moved from Israel and I had a crush on her. Facebook says she's married :(",
                 photo_url: "",
                 category: "random"
             }
