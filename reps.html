@@ -163,7 +163,7 @@
             color: white;
             font-size: 10px;
         }
-        .legend-pin.random { background: #dc3545; }
+        .legend-pin.other { background: #dc3545; }
 
         .instructions {
             background: #f8f9fa;
@@ -257,8 +257,8 @@
             <span>Celebrities</span>
         </div>
         <div class="legend-item">
-            <div class="legend-pin random"></div>
-            <span>Random People</span>
+            <div class="legend-pin other"></div>
+            <span>Other</span>
         </div>
     </div>
 
@@ -326,7 +326,7 @@
                 date: "2025-09-16",
                 story: "I went to Chris Gethard's demonstration/talk about his non-profit Laughing Together at UCB around 5 PM. After the demonstration, I decided to walk to Bravo Pizza on Park Ave for a chicken roll. I'm walking past Whiskey Roxx, minding my business, and who do I see? C.B.! She walked right past me without noticing. (teen tour friend)",
                 photo_url: "images/encounters/cb.jpg",
-                category: "random"
+                category: "other"
             },
             {
                 lat: 40.764165,
@@ -335,7 +335,7 @@
                 date: "2025-09-10",
                 story: "It was a rainy day, but I had an 8:55 AM iPhone battery replacement appointment I had to get to. So I braved the weather and walked the 15 minutes to the 5th Avenue Apple Store. Crazy store, amiright?! But on my way there, I walked past K.S.! K.S. and I went on a teen tour together many moons ago. She was rushing and didn't see me.",
                 photo_url: "",
-                category: "random"
+                category: "other"
             },
             {
                 lat: 40.764165,
@@ -463,10 +463,10 @@
                 const colors = {
                     'high-school': '#007bff',
                     'college': '#00a651',
-                    'random': '#dc3545'
+                    'other': '#dc3545'
                 };
                 
-                const color = colors[encounter.category] || colors['random'];
+                const color = colors[encounter.category] || colors['other'];
                 
                 marker = L.circleMarker([encounter.lat, encounter.lng], {
                     radius: 8,
